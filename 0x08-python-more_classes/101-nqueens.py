@@ -1,65 +1,81 @@
 #!/usr/bin/python3
-'''N Queens Problem'''
+"""Module is to solve the N-Queens challenge problem"""
+from sys import argv
 
 
-def validation(chessboard, row, column):
-    '''validates current position to see if its available
-       vs the queens already set on the columns to the left.
-    Args:
-        chessboard: actual state of the game.
-        row: row to validate.
-        column: column to validate.
-    '''
-    for col in range(column):
-        # checks if there is no queen in the row or diagonal
-        if (chessboard[col] == row or
-                # checks the slope:
-                abs(col - column) == abs(chessboard[col] - row)):
-            return False
-    return True
+def checkspot(board, r, c):
+    n = len(board) - 1
+    if board[r][c]:
+        return 0
+    for row in range(r):
+        if board[row][c]:
+            return 0
+    i = r
+    j = c
+    while i > 0 and j > 0:
+        i -= 1
+        j -= 1
+        if board[i][j]:
+            return 0
+    i = r
+    j = c
+    while i > 0 and j < n:
+        i -= 1
+        j += 1
+        if board[i][j]:
+            return 0
+    return 1
 
 
-def backtracking(chessboard, column):
-    '''backtracking application.
-    Args:
-        chessboard: actual state of the game.
-        column: the colum to backtrack,
-    '''
-    q = len(chessboard)
-    # when all the queens are set and the validation is True,
-    # prints the solution
-    if column == q:
-        solution = []
-        for col in range(q):
-            solution.append([col, chessboard[col]])
-        print(solution)
-        return
+def initboard(n=4):
+    b = []
+    for r in range(n):
+        b.append([0 for c in range(n)])
+    return b
 
-    for row in range(q):
-        # if validation is True, a new queen is set and start to test a new one
-        if validation(chessboard, row, column):
-            chessboard[column] = row
-            backtracking(chessboard, column + 1)
+
+def findsoln(board, row):
+    for col in range(len(board)):
+        if checkspot(board, row, col):
+            board[row][col] = 1
+            if row == len(board) - 1:
+                print(convtosoln(board))
+                board[row][col] = 0
+                continue
+            if findsoln(board, row + 1):
+                return board
+            else:
+                board[row][col] = 0
+    return None
+
+
+def convtosoln(board):
+    soln = []
+    n = len(board)
+    for r in range(n):
+        for c in range(n):
+            if board[r][c]:
+                soln.append([r, c])
+    return soln
+
+
+def nqueens(n=4):
+    for col in range(n):
+        board = initboard(n)
+        board[0][col] = 1
+        findsoln(board, 1)
+
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) != 2:
+    if len(argv) != 2:
         print("Usage: nqueens N")
-        sys.exit(1)
-    q = 0
+        exit(1)
     try:
-        q = int(sys.argv[1])
+        n = int(argv[1])
     except:
         print("N must be a number")
-        sys.exit(1)
-    if q < 4:
+        exit(1)
+    if n < 4:
         print("N must be at least 4")
-        sys.exit(1)
-
-    # Creation of the chessboard
-    chessboard = []
-    for col in range(q):
-        chessboard.append(col)
-    # starts the seeking of the solution in the first column
-    backtracking(chessboard, 0)
+        exit(1)
+    nqueens(n)
