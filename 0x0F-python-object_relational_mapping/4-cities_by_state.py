@@ -14,6 +14,6 @@ if __name__ == '__main__':
                 FROM cities LEFT JOIN states\
                 ON states.id = cities.state_id\
                 ORDER BY cities.id ASC")
-    rows = cur.fetchal             
+    rows = cur.fetchall()
     for row in rows:
         print(row)
